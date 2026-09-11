@@ -20,6 +20,9 @@
 # production
 /build
 
+# local sqlite db (dev only; prod uses a Docker volume)
+/data
+
 # misc
 .DS_Store
 *.pem
@@ -32,6 +35,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+!**/.env.example
 
 # vercel
 .vercel
