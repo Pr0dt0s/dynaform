@@ -72,6 +72,12 @@ npm run dev
 
 No test suite yet. `npm run lint` runs ESLint; `npx tsc --noEmit` type-checks.
 
+## Privacy
+
+The hosted instance at `dynaform.prcm.xyz` is covered by [PRIVACY.md](PRIVACY.md), also
+served live at [dynaform.prcm.xyz/privacy](https://dynaform.prcm.xyz/privacy). Self-hosted
+instances aren't covered by it — that operator is their own data controller.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

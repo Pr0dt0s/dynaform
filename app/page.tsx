@@ -16,6 +16,11 @@ export default function Home() {
           Installs to <code>~/.claude/skills/dynaform</code>. Requires Node.js &gt;= 19, no other
           dependencies.
         </p>
+        <p className="text-xs text-gray-400">
+          <a href="/privacy" className="underline">
+            Privacy policy
+          </a>
+        </p>
       </div>
     </Centered>
   );
