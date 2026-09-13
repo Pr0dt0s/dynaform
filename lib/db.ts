@@ -1,4 +1,4 @@
-import Database from "better-sqlite3";
+import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
 import { generateId, generateSecret, hashSecret, verifySecret } from "./secret-token";
@@ -7,8 +7,8 @@ import type { EncryptedPayload, FormField, ResolveResult } from "./types";
 const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), "data", "dynaform.db");
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
-const db = new Database(DB_PATH);
-db.pragma("journal_mode = WAL");
+const db = new DatabaseSync(DB_PATH);
+db.exec("PRAGMA journal_mode = WAL");
 
 // Wrong PINs are capped, not slow-hashed — capping attempts server-side is what actually
 // stops guessing (the hash never leaves this process), and it lets a leaked link expire

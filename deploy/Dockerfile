@@ -1,15 +1,12 @@
 # syntax=docker/dockerfile:1
 #
 # Single service: Next.js standalone server + embedded SQLite (no separate DB container).
-# All three stages use the same base image/Node version so better-sqlite3's native
-# binding (built or downloaded in `deps`) stays ABI-compatible at runtime.
+# SQLite access is node:sqlite (built into Node 22+), not a native npm dependency, so
+# there's no compiled binding to keep ABI-compatible across stages and no C++ toolchain
+# needed here — that's the whole reason this replaced better-sqlite3.
 
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
-# better-sqlite3 ships prebuilt binaries for common platforms; these are a fallback in
-# case none matches this image's arch/libc and it has to compile from source.
-RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
-    && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 RUN npm ci
 
