@@ -246,7 +246,7 @@ function FieldInput({
   switch (field.type) {
     case "display":
       return (
-        <div className="rounded-md bg-gray-50 p-3 text-sm whitespace-pre-wrap">
+        <div className="rounded-md bg-gray-50 text-gray-900 p-3 text-sm whitespace-pre-wrap">
           {field.label && <div className="font-medium mb-1">{field.label}</div>}
           {field.content}
         </div>
@@ -523,7 +523,7 @@ function TableSelect({
     <fieldset>
       <legend className="block text-sm font-medium mb-1">{field.label}</legend>
       <table className="w-full text-sm border border-gray-200 rounded-md overflow-hidden">
-        <thead className="bg-gray-50">
+        <thead className="bg-gray-50 text-gray-700">
           <tr>
             <th className="w-8" />
             {field.columns?.map((col) => (
