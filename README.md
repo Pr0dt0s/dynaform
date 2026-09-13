@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# dynaform
 
-## Getting Started
+A short-lived, end-to-end encrypted form/secret relay for AI coding agents. Use it when an
+agent needs more from you than a yes/no chat answer — structured data, a choice from a
+list, a review step, or a credential that should never be typed into chat or logged
+anywhere.
 
-First, run the development server:
+It works by creating a form or a "give me a secret" request on a small hosted service,
+handing you a link, and waiting for you to fill it in. Every answer is encrypted **in your
+browser** before it's sent — the server only ever relays ciphertext it cannot read. A
+skill script decrypts it locally, on the machine running the agent, using a private key
+that never leaves it.
+
+Built for the case of driving [Claude Code](https://claude.com/claude-code) from a phone
+via remote control, where the built-in `AskUserQuestion` tool's terminal-rendered
+multi-select doesn't give you sliders, tables, multi-page forms, or a safe way to hand
+back a secret.
+
+## Install the skill
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+curl -fsSL https://dynaform.prcm.xyz/install.sh | sh
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Installs to `~/.claude/skills/dynaform`. Requires Node.js >= 19, no other dependencies —
+see [`public/skill/SKILL.md`](public/skill/SKILL.md) for the full field-type reference and
+usage.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set `DYNAFORM_PIN` (or answer the install prompt) to choose a PIN. Every link created by
+your install of the skill will require it before it opens — protects you if a link ever
+leaks (a notification preview, a synced clipboard, chat history) since the URL alone is no
+longer enough. **Never share that PIN with anyone** — if you're ever asked to enter a PIN
+someone else gave you, that's not a legitimate dynaform link.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Security model
 
-## Learn More
+- **End-to-end encryption**: an ephemeral ECDH keypair is generated locally by the skill
+  script for every request; only the public half is sent to the server. Your browser
+  encrypts the answer against it (AES-256-GCM) before submitting — the server stores and
+  relays ciphertext only, and the private key never leaves the machine that created the
+  request.
+- **One-time, short-lived links**: every form/secret-request expires after ~30 minutes
+  (configurable) and is deleted immediately after being read once.
+- **Optional PIN gate**: see above — closes the gap where the link itself is a bearer
+  token.
+- **What this does *not* protect against**: a malicious *requester*. Anyone can run this
+  server and ask you for a "secret" — the encryption only stops the server operator from
+  reading it, not whoever created the request, since they're the intended recipient. The
+  secret-submission page carries a warning about this; don't submit anything to a link you
+  don't already trust the sender of.
 
-To learn more about Next.js, take a look at the following resources:
+## Self-hosting
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`deploy/` has a `Dockerfile` (Next.js standalone + embedded SQLite, no separate DB
+container needed) and a Traefik-based `compose.yml`. Copy `deploy/.env.example` to
+`deploy/.env`, set `APP_DOMAIN` (and `CERT_RESOLVER`/`TRAEFIK_NETWORK` if you're not using
+the same names), then:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+docker compose -f deploy/compose.yml up -d --build
+```
 
-## Deploy on Vercel
+Not using Traefik? Drop the `labels:`/`networks:` block in `compose.yml` and add
+`ports: ["3000:3000"]` instead, then put whatever reverse proxy you use in front.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+npm run dev
+```
+
+No test suite yet. `npm run lint` runs ESLint; `npx tsc --noEmit` type-checks.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
