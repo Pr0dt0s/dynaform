@@ -1,0 +1,8 @@
+{
+  "name": "dynaform",
+  "description": "Ask the human for structured input (text, single/multi-select, or a display of data to review) via a short-lived web form, or ask them to paste a secret credential — end-to-end encrypted, so the server hosting the form never sees the answer, and a pasted secret is written straight to a local file instead of ever appearing in this conversation.",
+  "author": {
+    "name": "Pr0dt0s"
+  },
+  "homepage": "https://dynaform.prcm.xyz"
+}
