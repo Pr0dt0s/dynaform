@@ -52,6 +52,18 @@ db.exec(`
   );
 `);
 
+// CREATE TABLE IF NOT EXISTS above only helps on a brand-new database — an existing one
+// (e.g. a deployment from before the PIN feature) keeps its old columns forever otherwise.
+// ADD COLUMN IF NOT EXISTS (SQLite 3.35+, well within what better-sqlite3 bundles) makes
+// picking up new columns idempotent and safe to run on every boot.
+for (const table of ["forms", "secrets"]) {
+  db.exec(`
+    ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS pin_hash TEXT;
+    ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS pin_attempts INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS unlock_token_hash TEXT;
+  `);
+}
+
 function ttlMs(): number {
   const minutes = Number(process.env.FORM_TTL_MINUTES) || 30;
   return minutes * 60 * 1000;
